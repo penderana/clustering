@@ -217,8 +217,21 @@ for caso in casos:
     else:
         print("No han aparecido outliers que filtrar.")
     
-    
-    
+
+    # COMPROBAMOS DIFERENCIA DE METRICAS FILTRANDO OUTILERS
+    # Repetimos experimento inicial pero con los datos filtrados
+
+    for name, alg in clustering:
+        cluster_predict = alg.fit_predict(X_filtrado)
+        print("Metricas antes de", name + ":")
+        print("\tCH:", resultados[name][0])
+        print("\tS:", resultados[name][1])
+        metric_CH = metrics.calinski_harabasz_score(X_normal, cluster_predict)
+        metric_SC = metrics.silhouette_score(X_normal, cluster_predict, metric='euclidean',
+                                             sample_size=floor(muestra_silhoutte * len(X)), random_state=22)
+        print("Metricas despues de", name + ":")
+        print("\tCH:", metric_CH)
+        print("\tS:", metric_SC)
     # =============================================================================
     # DENDOGRAMA Y HEATMAP
     # =============================================================================
