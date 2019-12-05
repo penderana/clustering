@@ -177,11 +177,16 @@ for caso in casos:
     for name,alg in clustering: 
         cluster_predict = predicciones[name]
         metricas = resultados[name]
+        demasiados = len(np.unique(cluster_predict)) > 3
         for i in np.unique(cluster_predict):
             aber = X_transformed[i==cluster_predict]
             aber_d = pd.DataFrame(aber)
             cadena = "cluster "+str(i)
-            plt.scatter(aber[:,0],aber[:,1],label=cadena)
+
+            if demasiados:
+                plt.scatter(aber[:, 0], aber[:, 1])
+            else:
+                plt.scatter(aber[:,0],aber[:,1],label=cadena)
             plt.legend()
             plt.title("Clasificacion de "+name)
         plt.show()
