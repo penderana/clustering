@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+ # -*- coding: utf-8 -*-
 """
 Created on Thu Nov 28 19:06:58 2019
 
@@ -28,7 +28,7 @@ for col in datos:
    datos[col].fillna(datos[col].mean(), inplace=True)
   
 
-j = 1
+j = 0
 # =============================================================================
 #                   ESPECIFICAMOS LOS CASOS
 # =============================================================================
@@ -44,12 +44,11 @@ usadas2 = ['NHIJOSCONV','TEMPRELA','EDADHIJO1','NSINTRAB','ANOPTRAB']
 usadas3 = ['ANOPARADO','NEMPLEMAS12','EDADPTRAB','NRESI','INGREHOG']
 
 casos = []
-#casos.append(np.array([subset1,usadas1]))
+casos.append(np.array([subset1,usadas1]))
 casos.append(np.array([subset2,usadas2]))
 casos.append(np.array([subset3,usadas3]))
 
 time_inicio = time.time()
-
 
 
 
@@ -63,13 +62,8 @@ for caso in casos:
     X = subset[usadas]
     X_normal = preprocessing.normalize(X, norm='l2')
     
-    embedding = MDS(n_components=2)
-    X_transformed = embedding.fit_transform(X_normal)
 
-    plt.scatter(X_transformed[:,0],X_transformed[:,1])
-    plt.title("Datos originales del caso " +str(j))
-    plt.show()
-'''    
+  
     if len(X) > 10000:
         muestra_silhoutte = 0.2
     else:
@@ -106,7 +100,7 @@ for caso in casos:
         n_n = len(np.unique(cluster_predict))
         if n_n < 50:
             tamanio.append(n_n)
-        print(name," ha tardado {:.2f} segundos.".format(tiempo))
+#        print(name," ha tardado {:.2f} segundos.".format(tiempo))
         predicciones[name] = cluster_predict
         metric_CH = metrics.calinski_harabasz_score(X_normal, cluster_predict)
         metric_SC = metrics.silhouette_score(X_normal, cluster_predict, metric='euclidean', sample_size=floor(muestra_silhoutte*len(X)), random_state=22)
@@ -129,18 +123,18 @@ for caso in casos:
             cluster_predict = 0
             cluster_predict = alg.fit_predict(X_normal) 
             tiempo = time.time() - t
-            print(name," ha tardado {:.2f} segundos.".format(tiempo))
+#            print(name," ha tardado {:.2f} segundos.".format(tiempo))
             metric_CH = metrics.calinski_harabasz_score(X_normal, cluster_predict)
             metric_SC = metrics.silhouette_score(X_normal, cluster_predict, metric='euclidean', sample_size=floor(muestra_silhoutte*len(X)), random_state=22)
-    
+#            print(n,round((metric_CH),4),round((metric_SC),4))
             try:
                 metricas = resultados[name]
                             
-                if metricas[0] > metric_CH and metricas[1] > metric_SC:
+                if metricas[0] < metric_CH and metricas[1] < metric_SC:
                     resultados[name] = np.array([round((metric_CH),4),round((metric_SC),4)])
                     predicciones[name] = cluster_predict
                     
-                elif metricas[0] - metric_CH >= 200:
+                elif metric_CH - metricas[0] >= 200:
                     resultados[name] = np.array([round((metric_CH),4),round((metric_SC),4)])
                     predicciones[name] = cluster_predict
                     
@@ -157,11 +151,11 @@ for caso in casos:
     # =============================================================================
     #     MOSTRAMOS LOS RESULTADOS DE LAS MEJORES METRICAS
     # =============================================================================
-    print("Resultados:")
-    for name,alg in clustering:
-        print("Metricas de",name,"con",len(np.unique(predicciones[name])),"clusteres :")
-        print("\tCH:",resultados[name][0])
-        print("\tS:",resultados[name][1])
+#    print("Resultados:")
+#    for name,alg in clustering:
+#        print("Metricas de",name,"con",len(np.unique(predicciones[name])),"clusteres :")
+#        print("\tCH:",resultados[name][0])
+#        print("\tS:",resultados[name][1])
     # =============================================================================
     # #REPRESENTACION APROXIMADA DE LOS CLUSTERES
     # =============================================================================
@@ -314,6 +308,6 @@ for caso in casos:
     sns_plot.fig.subplots_adjust(wspace=.03, hspace=.03);
     sns_plot.savefig(cadena)
     print("")
-'''
+
 
 print("Tiempo ejecucion total:",time.time()-time_inicio,"segundos.")
